@@ -1,4 +1,5 @@
 import json
+import os
 from os.path import join
 
 import cv2
@@ -30,6 +31,12 @@ def generate_dataset(label_data_path, image_dir, out_image_dir, mask_dir):
 
 
 if __name__ == '__main__':
+
+    os.makedirs('data/masked_number_plates/train/images')
+    os.makedirs('data/masked_number_plates/train/masks')
+    os.makedirs('data/masked_number_plates/val/images')
+    os.makedirs('data/masked_number_plates/val/masks')
+
     generate_dataset(
         'data/number_plates/train/via_region_data.json',
         'data/number_plates/train',

@@ -32,7 +32,7 @@ def create_model(num_classes):
 
 if __name__ == '__main__':
 
-    device = torch.device('cpu')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     dataset = CarPlateDataset(
         'data/masked_number_plates/train', get_transform(train=True)
