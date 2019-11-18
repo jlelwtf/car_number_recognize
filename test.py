@@ -1,6 +1,8 @@
 from PIL import Image
 import numpy as np
 
+from car_plate_dataset import CarPlateDataset
+from main import get_transform
 
 if __name__ == '__main__':
     mask = Image.open('data/masked_number_plates/train/masks/c867f1fe1e7f46c56df3b1cf649e5b91.png')
