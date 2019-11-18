@@ -62,6 +62,9 @@ class CarPlateDataset:
 
         return img, target
 
+    def get_image_name(self, idx):
+        return self._images[idx]
+
     def __len__(self):
         return len(self._images)
 

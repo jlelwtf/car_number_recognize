@@ -1,6 +1,9 @@
+Cython
 torch
 torchvision
+pycocotools
 opencv-python
 imutils
 Pillow
 numpy
+matplotlib

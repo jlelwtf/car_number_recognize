@@ -6,6 +6,24 @@ import cv2
 import numpy as np
 
 
+stop_list = [
+    '236086200orig',
+    '236273765orig',
+    '239940611orig',
+    '242294187orig',
+    '249534768orig',
+    '250018121orig',
+    '250019884orig',
+    '250020320orig',
+    '250026658orig',
+    '250029126orig',
+    '236086200orig',
+    '236273765orig',
+    '239940611orig',
+    '242294187orig',
+]
+
+
 def create_mask(shape, regions):
     mask = np.zeros(shape)
     for idx, region in enumerate(regions):
@@ -23,11 +41,12 @@ def generate_dataset(label_data_path, image_dir, out_image_dir, mask_dir):
     meta = data['_via_img_metadata']
     for _, image_data in meta.items():
         image_name = image_data['filename']
-        image = cv2.imread(join(image_dir, image_name))
-        mask = create_mask(image.shape[:-1], image_data['regions'])
-        image_name = ''.join(image_name.split('.')[:-1]) + '.png'
-        cv2.imwrite(join(out_image_dir, image_name), image)
-        cv2.imwrite(join(mask_dir, image_name), mask)
+        base_image_name = ''.join(image_name.split('.')[:-1])
+        if base_image_name not in stop_list:
+            image = cv2.imread(join(image_dir, image_name))
+            mask = create_mask(image.shape[:-1], image_data['regions'])
+            cv2.imwrite(join(out_image_dir, base_image_name + '.png'), image)
+            cv2.imwrite(join(mask_dir, base_image_name + '.png'), mask)
 
 
 if __name__ == '__main__':
