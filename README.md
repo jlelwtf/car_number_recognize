@@ -1,30 +1,39 @@
-#README
+Car numberplate recognition
 
-###mask rcnn
 
-trained model: https://github.com/jlelwtf/car_number_recognize/blob/master/models/data/mask-rcnn.pth
+##Mask RCNN model
 
-or install 
-```
-git-lfs 
-```
-and run into repo
-``` 
-git lfs fetch --all 
+Download trained model: https://github.com/jlelwtf/car_number_recognize/blob/master/models/data/mask-rcnn.pth
+
+Or install git-lfs and run into repo:
+```bash
+git lfs fetch --all
 ```
 
-#### Install pytorch
-for CUDA 10.0
+##Install libraries
+### Install pytorch
+to install for CUDA 10.1
+```bash
+pip install torch torchvision
 ```
+
+to install for CUDA 10.0
+```bash
 pip install torch==1.2.0 torchvision==0.4.0 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-for CUDA 9.2
-```
+to install for CUDA 9.2
+```bash
 pip install torch==1.2.0+cu92 torchvision==0.4.0+cu92 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-for CPU only
-```
+to install for CPU only
+```bash
 pip install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+```
+
+### Install other libs
+
+```bash
+pip instal -r requirements.txt
 ```
 
 #### Datasets
