@@ -4,7 +4,7 @@ import torch
 from PIL import Image
 
 
-class CarPlateDataset:
+class MaskPlateDataset:
 
     def __init__(self, path, transforms):
         self._transforms = transforms
@@ -45,7 +45,7 @@ class CarPlateDataset:
 
         image_id = torch.tensor([idx])
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
-        # suppose all instances are not crowd
+
         iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
 
         target = {

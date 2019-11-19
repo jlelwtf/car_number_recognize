@@ -4,7 +4,7 @@ import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 from torch_vis import transforms as T
-from car_plate_dataset import CarPlateDataset
+from datasets.mask_plate_dataset import MaskPlateDataset
 from torch_vis.engine import train_one_epoch, evaluate
 import utils
 
@@ -34,10 +34,10 @@ if __name__ == '__main__':
 
     device = torch.device('cpu')
 
-    dataset = CarPlateDataset(
+    dataset = MaskPlateDataset(
         'data/masked_number_plates/train', get_transform(train=True)
     )
-    dataset_test = CarPlateDataset(
+    dataset_test = MaskPlateDataset(
         'data/masked_number_plates/val', get_transform(train=False)
     )
 

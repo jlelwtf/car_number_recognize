@@ -1,37 +1,23 @@
-from PIL import Image
-import numpy as np
+from time import time
 
-from car_plate_dataset import CarPlateDataset
-from main import get_transform
+import cv2
+
+from models.mask_rcnn import MaskRCNN
+from number_plate_detector import NumberPlateDetector
 
 if __name__ == '__main__':
-    # mask = Image.open('data/masked_number_plates/train/masks/c867f1fe1e7f46c56df3b1cf649e5b91.png')
-    # mask = np.array(mask)
-    # obj_ids = np.unique(mask)
-    # obj_ids = obj_ids[1:]
-    #
-    # masks = mask == obj_ids[:, None, None]
-    #
-    # num_objs = len(obj_ids)
-    # boxes = []
-    # for i in range(num_objs):
-    #     pos = np.where(masks[i])
-    #     print(pos)
-    #     x_min = np.min(pos[1])
-    #     x_max = np.max(pos[1])
-    #     y_min = np.min(pos[0])
-    #     y_max = np.max(pos[0])
-    #     boxes.append([x_min, y_min, x_max, y_max])
-    dataset = CarPlateDataset(
-        'data/masked_number_plates/train', get_transform(train=True)
-    )
-    dataset_test = CarPlateDataset(
-        'data/masked_number_plates/val', get_transform(train=False)
-    )
-    # val = dataset[181]
-    #
-    for idx in range(len(dataset)):
-        try:
-            val = dataset[idx]
-        except:
-            print(dataset.get_image_name(idx))
+    rcnn = MaskRCNN(device='cpu')
+    rcnn.load('models/data/mask-rcnn.pth')
+    detector = NumberPlateDetector(rcnn)
+    # image = cv2.imread('datasets/masked_number_plates/val/images/250023138orig.png')
+    image = cv2.imread('test2.jpg')
+    t = time()
+    res = detector.detect_number(image)
+    print(time() - t)
+    t = time()
+    res = detector.detect_number(image)
+    print(time() - t)
+
+    if res is not None:
+        cv2.imshow('asd', res)
+        cv2.waitKey(0)
