@@ -10,7 +10,7 @@ Or install git-lfs and run into repo:
 git lfs fetch --all
 ```
 
-##Install libraries
+#Install libraries
 ### Install pytorch
 to install for CUDA 10.1
 ```bash
@@ -36,7 +36,7 @@ pip install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.
 pip instal -r requirements.txt
 ```
 
-#### Datasets
+### Datasets
 From https://nomeroff.net.ua
 
 downloading:
