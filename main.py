@@ -10,7 +10,7 @@ import utils
 
 
 def get_transform(train):
-    transforms = [T.ToTensor()]
+    transforms = [T.ToRCNNTensor()]
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)

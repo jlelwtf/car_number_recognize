@@ -1,6 +1,6 @@
 import imutils
 import torch
-from typing import Optional
+from typing import Optional, List, Tuple
 
 import cv2
 import numpy as np
@@ -16,9 +16,9 @@ class NumberPlateDetector:
     @staticmethod
     def _get_rect(mask: np.array) -> Optional[np.array]:
         if cv2.__version__[0] == "4":
-            cnts, _ = cv2.findContours(mask, 1, 2)
+            cnts, _ = cv2.findContours(mask, 1, 1)
         else:
-            cnts = cv2.findContours(mask, 1, 2)
+            cnts = cv2.findContours(mask, 1, 1)
             cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
         epsilon = 0.05 * cv2.arcLength(cnts[0], True)
@@ -27,12 +27,11 @@ class NumberPlateDetector:
             return None
         return approx.reshape((4, 2)).astype(np.float32)
 
-
     @staticmethod
     def _convert_mask(mask: torch.Tensor) -> np.array:
         np_mask = mask.cpu().detach().numpy()[0]
-        np_mask[np_mask > 0.6] = 1
-        np_mask[np_mask <= 0.6] = 0
+        np_mask[np_mask > 0.2] = 1
+        np_mask[np_mask <= 0.2] = 0
         np_mask = np_mask.astype(np.uint8)
         np_mask = (np_mask + 1) % 2
         return np_mask
@@ -82,17 +81,22 @@ class NumberPlateDetector:
 
         return warped
 
-    def detect_number(self, image: np.array) -> Optional[np.array]:
+    def detect_number(self, image: np.array) -> Tuple[List[np.array], List[np.array]]:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         img_tensor = F.to_tensor(image).to(self._mask_rcnn_model.device)
         result = self._mask_rcnn_model.predict([img_tensor])
-        if result:
-            detect = result[0]
-            mask = self._convert_mask(detect['masks'][0])
-            rect = self._get_rect(mask)
-            if rect is not None:
-                return self._four_point_transform(image, rect)
-        return None
+        number_plates = []
+        rects = []
+
+        for detect in result:
+            for mask in detect['masks']:
+                mask = self._convert_mask(mask)
+                rect = self._get_rect(mask)
+                if rect is not None:
+                    number_plates.append(self._four_point_transform(image, rect))
+                    rects.append(rect)
+
+        return number_plates, rects
 
 
 

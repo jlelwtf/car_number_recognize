@@ -1,6 +1,7 @@
 import json
 import os
 from os.path import join
+from shutil import move, rmtree
 
 import cv2
 import numpy as np
@@ -69,14 +70,12 @@ if __name__ == '__main__':
         '-d datasets'
     )
 
-    os.system(
-        'mv '
-        'datasets/autoriaNumberplateDataset-2019-03-06 '
+    move(
+        'datasets/autoriaNumberplateDataset-2019-03-06 ',
         'datasets/number_plates'
     )
 
-    os.system(
-        'rm '
+    os.remove(
         'datasets/autoriaNumberplateDataset-2019-03-06.zip '
     )
 
@@ -101,4 +100,4 @@ if __name__ == '__main__':
         'datasets/masked_number_plates/val/masks'
     )
 
-    os.system('rm -rf datasets/number_plates')
+    rmtree('datasets/number_plates')

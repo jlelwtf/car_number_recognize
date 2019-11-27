@@ -1,12 +1,16 @@
 import os
+from typing import Tuple
+
 import numpy as np
 import torch
 from PIL import Image
 
+from torch_vis.transforms import Transform
+
 
 class MaskPlateDataset:
 
-    def __init__(self, path, transforms):
+    def __init__(self, path: str, transforms: Transform):
         self._transforms = transforms
         self._path = path
 
@@ -16,7 +20,7 @@ class MaskPlateDataset:
         self._images = list(sorted(os.listdir(self._images_path)))
         self._masks = list(sorted(os.listdir(self._masks_path)))
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> Tuple[np.array, dict]:
 
         img_path = os.path.join(self._images_path, self._images[idx])
         mask_path = os.path.join(self._masks_path, self._masks[idx])
@@ -62,9 +66,9 @@ class MaskPlateDataset:
 
         return img, target
 
-    def get_image_name(self, idx):
+    def get_image_name(self, idx: int) -> str:
         return self._images[idx]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._images)
 
