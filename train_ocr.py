@@ -21,8 +21,8 @@ if __name__ == '__main__':
 
     argv = arg_parser.parse_args(sys.argv[1:])
 
-    model = OCRModel(symbol_list, argv['device'])
+    model = OCRModel(symbol_list, device=argv.device)
 
-    model.train(argv['train_dataset_path'], argv['val_dataset_path'],
-                argv['batch_size'], argv['num_epochs'])
+    model.train(argv.train_dataset_path, argv.val_dataset_path,
+                argv.batch_size, argv.num_epochs)
 
