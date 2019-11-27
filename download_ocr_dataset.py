@@ -15,7 +15,7 @@ if __name__ == '__main__':
     )
 
     move(
-        'datasets/autoriaNumberplateOcrRu-2019-08-30 ',
+        'datasets/autoriaNumberplateOcrRu-2019-08-30',
         'datasets/ocr_dataset'
     )
 

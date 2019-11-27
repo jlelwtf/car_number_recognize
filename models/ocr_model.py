@@ -76,7 +76,8 @@ class OCRModel(Model):
             loss = loss_func(predict, target_batch, input_lengths, target_lengths)
             loss.backward()
             optimizer.step()
-            print(f'{loss.data.cpu()}')
+            print(f'{loss.data.cpu()}', end='\r')
+        print()
 
     def _evaluate(self, data_loader, loss_func):
         self._net.eval()
@@ -95,7 +96,7 @@ class OCRModel(Model):
             predict = predict.view((shape[1], shape[0], shape[2]))
 
             loss_vals.append(
-                loss_func(predict, target_batch, input_lengths, target_lengths)
+                loss_func(predict, target_batch, input_lengths, target_lengths).data.cpu()
             )
 
         loss = np.mean(loss_vals)
