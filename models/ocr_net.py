@@ -62,7 +62,7 @@ class OCRNet(torch.nn.Module):
             out_features=self.num_classes
         )
 
-        self.out_activation = torch.nn.LogSoftmax()
+        self.out_activation = torch.nn.LogSoftmax(dim=2)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.conv1(x)

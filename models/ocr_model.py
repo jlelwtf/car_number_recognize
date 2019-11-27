@@ -65,18 +65,17 @@ class OCRModel(Model):
             count += len(image_batch)
             print(f'{count}/{len(data_loader.dataset)}. Loss: ', end='')
 
-            optimizer.zero_grad()
             image_batch = image_batch.to(self.device)
             target_batch = target_batch.to(self.device)
             predict = self._net.forward(image_batch)
-
-            shape = predict.shape
-            predict = predict.view((shape[1], shape[0], shape[2]))
+            predict = predict.permute(1, 0, 2)
 
             loss = loss_func(predict, target_batch, input_lengths, target_lengths)
             loss.backward()
+
+            optimizer.zero_grad()
             optimizer.step()
-            print(f'{loss.data.cpu()}', end='\r')
+            print(f'{loss.data.cpu()}                              ', end='\r')
         print()
 
     def _evaluate(self, data_loader, loss_func):
@@ -92,8 +91,7 @@ class OCRModel(Model):
             target_batch = target_batch.to(self.device)
 
             predict = self._net.forward(image_batch)
-            shape = predict.shape
-            predict = predict.view((shape[1], shape[0], shape[2]))
+            predict = predict.permute(1, 0, 2)
 
             loss_vals.append(
                 loss_func(predict, target_batch, input_lengths, target_lengths).data.cpu()
@@ -125,7 +123,7 @@ class OCRModel(Model):
             num_workers=4,
         )
 
-        optimizer = torch.optim.Adam(self._net.parameters(), lr=1.0e-3)
+        optimizer = torch.optim.SGD(self._net.parameters(), lr=1.0e-3)
 
         lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
