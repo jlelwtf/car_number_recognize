@@ -8,7 +8,7 @@ arg_parser.add_argument('--train_dataset_path', default='datasets/ocr_dataset/tr
 arg_parser.add_argument('--val_dataset_path', default='datasets/ocr_dataset/val')
 arg_parser.add_argument('--model_weights_path', default='models/data/ocr_model.pth')
 arg_parser.add_argument('--device', default='cpu')
-arg_parser.add_argument('--batch_size', default=32)
+arg_parser.add_argument('--batch_size', default=64)
 arg_parser.add_argument('--num_epochs', default=10)
 
 
@@ -26,3 +26,4 @@ if __name__ == '__main__':
     model.train(argv.train_dataset_path, argv.val_dataset_path,
                 argv.batch_size, argv.num_epochs)
 
+    model.save(argv.model_weights_path)

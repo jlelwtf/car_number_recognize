@@ -71,10 +71,11 @@ class OCRModel(Model):
             predict = predict.permute(1, 0, 2)
 
             loss = loss_func(predict, target_batch, input_lengths, target_lengths)
-            loss.backward()
 
             optimizer.zero_grad()
+            loss.backward()
             optimizer.step()
+            # lr_scheduler.step()
             print(f'{loss.data.cpu()}                              ', end='\r')
         print()
 
@@ -123,7 +124,7 @@ class OCRModel(Model):
             num_workers=4,
         )
 
-        optimizer = torch.optim.SGD(self._net.parameters(), lr=1.0e-3)
+        optimizer = torch.optim.SGD(self._net.parameters(), lr=5.0e-5)
 
         lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
@@ -131,12 +132,12 @@ class OCRModel(Model):
             gamma=0.1
         )
 
-        loss_func = torch.nn.CTCLoss()
+        loss_func = torch.nn.CTCLoss(blank=0, zero_infinity=True)
 
         for epoch in range(num_epochs):
             print(f'Epoch {epoch}/{num_epochs}')
             self._train_one_epoch(data_loader, loss_func, optimizer)
-            lr_scheduler.step()
+            # lr_scheduler.step(epoch)
             self._evaluate(data_loader_val, loss_func)
 
         # torch.save(self._net.state_dict(), weight_path)
