@@ -34,5 +34,5 @@ class Model:
 
         self._net.eval()
 
-    def predict(self, x: List[torch.Tensor]) -> List[dict]:
+    def predict(self, x: List[torch.Tensor]):
         return self._net(x)
