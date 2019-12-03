@@ -17,15 +17,11 @@ class OCRModel(Model):
     def __init__(
             self,
             symbol_list: List[str],
-            sep_symbol='-',
-            space_symbol='|',
             image_height=128,
             image_width=64,
             device='cuda',
     ):
         super().__init__(device=device)
-        self.space_symbol = space_symbol
-        self.sep_symbol = sep_symbol
         self._image_width = image_width
         self._image_height = image_height
         self._symbol_list = symbol_list
@@ -141,8 +137,8 @@ class OCRModel(Model):
             num_workers=4,
         )
 
-        # optimizer = SGD(self._net.parameters(), lr=0.002)
-        optimizer = torch.optim.Adam(self._net.parameters())
+        optimizer = SGD(self._net.parameters(), lr=0.02, weight_decay=1e-6, momentum=0.9, nesterov=True)
+        # optimizer = torch.optim.Adam(self._net.parameters())
 
         lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
