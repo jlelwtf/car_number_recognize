@@ -123,8 +123,8 @@ class OCRModel(Model):
         def weights_init(m):
             if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
                 torch.nn.init.xavier_uniform_(m.weight)
-                if m.bias:
-                    torch.nn.init.xavier_uniform_(m.bias)
+                # if m.bias is not None:
+                #     torch.nn.init.xavier_uniform_(m.bias)
 
         self._net.apply(weights_init)
 
@@ -156,18 +156,17 @@ class OCRModel(Model):
             optimizer,
             step_size=2,
             gamma=0.1,
-            last_epoch=6,
-
         )
 
         loss_func = torch.nn.CTCLoss(blank=0, zero_infinity=True)
         for epoch in range(num_epochs):
             print(f'Epoch {epoch + 1}/{num_epochs}')
+            print(f'Learning rate: {optimizer.defaults["lr"]}')
             self._train_one_epoch(data_loader, loss_func, optimizer)
-            lr_scheduler.step(epoch)
+            if epoch <= 6:
+                lr_scheduler.step(epoch)
             val_loss = self._evaluate(data_loader_val, loss_func)
             print(f'Evaluate: Loss: {val_loss}')
-            print(f'Learning rate: {optimizer.defaults["lr"]}')
             print()
             epoch += 1
 
