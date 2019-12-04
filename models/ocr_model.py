@@ -8,8 +8,7 @@ from torch.utils.data import DataLoader
 from datasets.ocr_dataset import OCRDataset
 from models.model import Model
 from models.ocr_net import OCRNet
-from torch_vis.transforms import Compose, TransformImageForOCR, TransformRuLabel, \
-    ToOCRTensor
+from torch_vis.transforms import Compose, TransformImageForOCR, ToOCRTensor
 
 
 class OCRModel(Model):
@@ -118,21 +117,23 @@ class OCRModel(Model):
             self,
             train_dataset_path: str,
             val_dataset_path: str,
-            num_epochs=10
+            num_epochs=10,
+            lr=0.002,
+            decrease_lr=True,
+            random_weight_init=True
     ):
-        def weights_init(m):
-            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
-                torch.nn.init.xavier_uniform_(m.weight)
-                # if m.bias is not None:
-                #     torch.nn.init.xavier_uniform_(m.bias)
+        if random_weight_init:
+            def weights_init(m):
+                if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
+                    torch.nn.init.xavier_uniform_(m.weight)
 
-        self._net.apply(weights_init)
+            self._net.apply(weights_init)
 
         dataset = OCRDataset(train_dataset_path, self._transforms)
         dataset_val = OCRDataset(val_dataset_path, self._transforms)
         data_loader = DataLoader(
             dataset,
-            batch_size=1,
+            batch_size=3,
             shuffle=True,
             num_workers=4,
         )
@@ -146,7 +147,7 @@ class OCRModel(Model):
 
         optimizer = SGD(
             self._net.parameters(),
-            lr=0.001,
+            lr=lr,
             weight_decay=1e-5,
             momentum=0.9,
             nesterov=True
@@ -163,7 +164,7 @@ class OCRModel(Model):
             print(f'Epoch {epoch + 1}/{num_epochs}')
             print(f'Learning rate: {optimizer.defaults["lr"]}')
             self._train_one_epoch(data_loader, loss_func, optimizer)
-            if epoch <= 6:
+            if epoch == 6 and decrease_lr:
                 lr_scheduler.step(epoch)
             val_loss = self._evaluate(data_loader_val, loss_func)
             print(f'Evaluate: Loss: {val_loss}')
