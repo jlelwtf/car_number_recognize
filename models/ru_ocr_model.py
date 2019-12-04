@@ -12,9 +12,9 @@ class RuOCRModel(OCRModel):
             "X", "Y", "-", "|"
         ]
 
-        super().__init__(symbol_list, device=device)
         self.sep_symbol = '-'
         self.space_symbol = '|'
+        super().__init__(symbol_list, device=device)
 
     def _get_transforms(self):
         return Compose([

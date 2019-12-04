@@ -118,14 +118,21 @@ class OCRModel(Model):
             self,
             train_dataset_path: str,
             val_dataset_path: str,
-            batch_size=32,
             num_epochs=10
     ):
+        def weights_init(m):
+            if isinstance(m, torch.nn.Conv2d) or isinstance(m, torch.nn.Linear):
+                torch.nn.init.xavier_uniform_(m.weight)
+                if m.bias:
+                    torch.nn.init.xavier_uniform_(m.bias)
+
+        self._net.apply(weights_init)
+
         dataset = OCRDataset(train_dataset_path, self._transforms)
         dataset_val = OCRDataset(val_dataset_path, self._transforms)
         data_loader = DataLoader(
             dataset,
-            batch_size=batch_size,
+            batch_size=1,
             shuffle=True,
             num_workers=4,
         )
@@ -137,29 +144,30 @@ class OCRModel(Model):
             num_workers=4,
         )
 
-        optimizer = SGD(self._net.parameters(), lr=0.02, weight_decay=1e-6, momentum=0.9, nesterov=True)
-        # optimizer = torch.optim.Adam(self._net.parameters())
+        optimizer = SGD(
+            self._net.parameters(),
+            lr=0.001,
+            weight_decay=1e-5,
+            momentum=0.9,
+            nesterov=True
+        )
 
         lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
-            step_size=3,
-            gamma=0.1
+            step_size=2,
+            gamma=0.1,
+            last_epoch=6,
+
         )
 
         loss_func = torch.nn.CTCLoss(blank=0, zero_infinity=True)
-        flag = True
-        val_los = 1
-        epoch = 1
-        while val_los > 0.8 and epoch <= num_epochs:
-            print(f'Epoch {epoch}/{num_epochs}')
-            loss = self._train_one_epoch(data_loader, loss_func, optimizer)
-            if loss < 1.2 and flag:
-                flag = False
-                lr_scheduler.step(epoch)
-
+        for epoch in range(num_epochs):
+            print(f'Epoch {epoch + 1}/{num_epochs}')
+            self._train_one_epoch(data_loader, loss_func, optimizer)
+            lr_scheduler.step(epoch)
             val_loss = self._evaluate(data_loader_val, loss_func)
-
             print(f'Evaluate: Loss: {val_loss}')
+            print(f'Learning rate: {optimizer.defaults["lr"]}')
             print()
             epoch += 1
 
