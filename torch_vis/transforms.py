@@ -102,7 +102,7 @@ class TransformRuLabel(Transform):
     def _transform_label(self, label: str) -> str:
         number = ''
         for symbol in label[:6]:
-            number += self._sep_symbol + symbol + symbol + self._sep_symbol
+            number += self._sep_symbol + symbol + self._sep_symbol
 
         region = ''
         for symbol in label[6:]:
