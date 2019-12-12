@@ -100,11 +100,15 @@ class TransformRuLabel(Transform):
         self._sep_symbol = sep_symbol
 
     def _transform_label(self, label: str) -> str:
-        number = self._sep_symbol.join(label[:6])
-        region = self._sep_symbol.join(label[6:])
-        # number = ''.join(label[:6])
-        # region = ''.join(label[6:])
-        return number + self._space_symbol + region
+        number = ''
+        for symbol in label[:6]:
+            number += self._sep_symbol + symbol + symbol + self._sep_symbol
+
+        region = ''
+        for symbol in label[6:]:
+            region += self._sep_symbol + symbol + symbol + self._sep_symbol
+
+        return number + self._space_symbol + self._space_symbol + region
 
     def __call__(self, image: np.array, label: str) -> Tuple[np.array, str]:
         label = self._transform_label(label)
