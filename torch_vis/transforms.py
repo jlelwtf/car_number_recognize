@@ -8,6 +8,7 @@ import cv2
 import imutils
 import numpy as np
 from torchvision.transforms.functional import to_tensor
+from imgaug import augmenters as iaa
 
 
 def _flip_coco_person_keypoints(kps, width):
@@ -53,6 +54,28 @@ class RandomHorizontalFlip(Transform):
                 keypoints = target["keypoints"]
                 keypoints = _flip_coco_person_keypoints(keypoints, width)
                 target["keypoints"] = keypoints
+        return image, target
+
+
+class Augmentation(Transform):
+    aug_pipeline = iaa.Sequential([
+        iaa.Sometimes(0.5, iaa.GaussianBlur((0, 3.0))),
+        iaa.OneOf([
+            iaa.Dropout((0.01, 0.1), per_channel=0.5),
+            iaa.CoarseDropout((0.03, 0.15), size_percent=(0.02, 0.05), per_channel=0.2),
+        ]),
+        iaa.SomeOf((0, 3), [
+            iaa.Sharpen(alpha=(0, 1.0), lightness=(0.75, 1.5)),
+            iaa.Emboss(alpha=(0, 1.0), strength=(0, 2.0)),
+            iaa.Sometimes(0.5, iaa.CropAndPad(percent=(-0.25, 0.25))),
+            iaa.Sometimes(0.5, iaa.Affine(rotate=3))
+        ])
+    ],
+        random_order=True
+    )
+
+    def __call__(self, image: np.array, target: Union[str, np.array, dict]):
+        image = self.aug_pipeline.augment_image(image)
         return image, target
 
 

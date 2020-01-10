@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from datasets.ocr_dataset import OCRDataset
 from models.model import Model
 from models.ocr_net import OCRNet
-from torch_vis.transforms import Compose, TransformImageForOCR, ToOCRTensor
+from torch_vis.transforms import Compose, TransformImageForOCR, ToOCRTensor, Augmentation
 
 
 class OCRModel(Model):
@@ -30,6 +30,7 @@ class OCRModel(Model):
 
     def _get_transforms(self):
         return Compose([
+            Augmentation(),
             TransformImageForOCR(self._image_height, self._image_width),
             ToOCRTensor(self._symbol_list, self._net.out_height,
                         self._net.out_height, len(self._symbol_list) - 1)
