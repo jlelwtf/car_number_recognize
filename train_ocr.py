@@ -12,6 +12,7 @@ arg_parser.add_argument('--device', default='cpu')
 arg_parser.add_argument('--num_epochs', default=10, type=int)
 arg_parser.add_argument('--lr', default=0.002, type=float)
 arg_parser.add_argument('--decrease_lr', default=True, type=bool)
+arg_parser.add_argument('--batch_size', default=1, type=int)
 
 
 if __name__ == '__main__':
@@ -28,8 +29,13 @@ if __name__ == '__main__':
 
     print(type(argv.decrease_lr))
     model.train(
-        argv.train_dataset_path, argv.val_dataset_path,
-        argv.num_epochs, argv.lr, argv.decrease_lr, random_weight_init
+        argv.train_dataset_path,
+        argv.val_dataset_path,
+        argv.batch_size,
+        argv.num_epochs,
+        argv.lr,
+        argv.decrease_lr,
+        random_weight_init
     )
 
     model.save(argv.model_weights_path)

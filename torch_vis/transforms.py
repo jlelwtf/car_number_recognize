@@ -107,7 +107,7 @@ class TransformRuLabel(Transform):
         region = ''
         for symbol in label[6:]:
             region += self._sep_symbol + symbol
-        return number + self._sep_symbol + self._space_symbol + self._space_symbol + region
+        return number + self._sep_symbol + self._space_symbol + self._sep_symbol + region
 
     def __call__(self, image: np.array, label: str) -> Tuple[np.array, str]:
         label = self._transform_label(label)

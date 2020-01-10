@@ -117,6 +117,7 @@ class OCRModel(Model):
             self,
             train_dataset_path: str,
             val_dataset_path: str,
+            batch_size: int,
             num_epochs=10,
             lr=0.002,
             decrease_lr=True,
@@ -133,14 +134,14 @@ class OCRModel(Model):
         dataset_val = OCRDataset(val_dataset_path, self._transforms)
         data_loader = DataLoader(
             dataset,
-            batch_size=3,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=4,
         )
 
         data_loader_val = DataLoader(
             dataset_val,
-            batch_size=1,
+            batch_size=32,
             shuffle=False,
             num_workers=4,
         )
@@ -155,16 +156,15 @@ class OCRModel(Model):
 
         lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
-            step_size=2,
+            step_size=1,
             gamma=0.1,
         )
 
         loss_func = torch.nn.CTCLoss(blank=0, zero_infinity=True)
         for epoch in range(num_epochs):
             print(f'Epoch {epoch + 1}/{num_epochs}')
-            print(f'Learning rate: {optimizer.defaults["lr"]}')
             self._train_one_epoch(data_loader, loss_func, optimizer)
-            if epoch == 6 and decrease_lr:
+            if epoch == 0 and decrease_lr:
                 lr_scheduler.step(epoch)
             val_loss = self._evaluate(data_loader_val, loss_func)
             print(f'Evaluate: Loss: {val_loss}')
