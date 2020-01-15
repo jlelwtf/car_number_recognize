@@ -2,7 +2,6 @@ from typing import List
 
 import numpy as np
 import torch
-from torch.optim import SGD
 from torch.utils.data import DataLoader
 
 from datasets.ocr_dataset import OCRDataset
@@ -26,11 +25,19 @@ class OCRModel(Model):
         self._symbol_list = symbol_list
         self._net = OCRNet(num_classes=len(symbol_list) + 1)
         self._net.to(device)
-        self._transforms = self._get_transforms()
+        self._train_transforms = self._get_train_transforms()
+        self._test_transforms = self._get_test_transforms()
 
-    def _get_transforms(self):
+    def _get_train_transforms(self):
         return Compose([
             Augmentation(),
+            TransformImageForOCR(self._image_height, self._image_width),
+            ToOCRTensor(self._symbol_list, self._net.out_height,
+                        self._net.out_height, len(self._symbol_list) - 1)
+        ])
+
+    def _get_test_transforms(self):
+        return Compose([
             TransformImageForOCR(self._image_height, self._image_width),
             ToOCRTensor(self._symbol_list, self._net.out_height,
                         self._net.out_height, len(self._symbol_list) - 1)
@@ -131,8 +138,8 @@ class OCRModel(Model):
 
             self._net.apply(weights_init)
 
-        dataset = OCRDataset(train_dataset_path, self._transforms)
-        dataset_val = OCRDataset(val_dataset_path, self._transforms)
+        dataset = OCRDataset(train_dataset_path, self._train_transforms)
+        dataset_val = OCRDataset(val_dataset_path, self._test_transforms)
         data_loader = DataLoader(
             dataset,
             batch_size=batch_size,
@@ -147,12 +154,10 @@ class OCRModel(Model):
             num_workers=4,
         )
 
-        optimizer = SGD(
+        optimizer = torch.optim.Adam(
             self._net.parameters(),
             lr=lr,
-            weight_decay=1e-5,
-            momentum=0.9,
-            nesterov=True
+            weight_decay=1e-6,
         )
 
         lr_scheduler = torch.optim.lr_scheduler.StepLR(

@@ -68,7 +68,7 @@ class Augmentation(Transform):
             iaa.Sharpen(alpha=(0, 1.0), lightness=(0.75, 1.5)),
             iaa.Emboss(alpha=(0, 1.0), strength=(0, 2.0)),
             iaa.Sometimes(0.5, iaa.CropAndPad(percent=(-0.25, 0.25))),
-            iaa.Sometimes(0.5, iaa.Affine(rotate=3))
+            iaa.Sometimes(0.5, iaa.Affine(rotate=5))
         ])
     ],
         random_order=True
@@ -144,9 +144,11 @@ class TransformImageForOCR(Transform):
 
     def _transform_image(self, image: np.array) -> np.array:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        image = imutils.rotate_bound(image, 90)
+        image = image.T
         image = cv2.resize(image, (self._image_width, self._image_height))
         image = np.expand_dims(image, 0)
+        image = image.astype(np.float32)
+        image /= 255
         return image
 
     def __call__(self, image: np.array, label: str) -> Tuple[np.array, str]:
